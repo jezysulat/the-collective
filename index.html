@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Collective — Invite Only</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   COLOR TOKENS
+   20% black | 40% off-white | 30% deep forest green | 10% gold
+============================================================ */
+:root {
+  --black:     #0B0B0C;
+  --black2:    #0f0f0e;
+  --offwhite:  #F0EDE4;
+  --offwhite2: #E8E3D8;
+  --green:     #163C2E;
+  --green2:    #1e5040;
+  --gold:      #C9A44D;
+}
+
+*  { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--black); color:var(--black); font-family:'Poppins',sans-serif; overflow-x:hidden; }
+
+/* ============================================================
+   INTRO SCREEN
+============================================================ */
+#intro {
+  position:fixed; inset:0; z-index:9999;
+  background: radial-gradient(ellipse at 45% 55%, #22201a 0%, #141310 50%, #0a0908 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transition:opacity 1s ease, visibility 1s ease;
+}
+#intro.gone { opacity:0; visibility:hidden; pointer-events:none; }
+
+/* ---- ABOVE TEXT ---- */
+.above {
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  margin-bottom:56px;
+  opacity:0; animation:fadeUp 1s ease 0.5s forwards;
+}
+.above-rule { width:40px; height:1px; background:rgba(201,164,77,0.45); }
+.above-txt  {
+  font-size:10px; letter-spacing:5px; text-transform:uppercase;
+  color:rgba(201,164,77,0.65); font-weight:400;
+}
+
+/* ---- ENVELOPE ---- */
+.env {
+  position:relative; width:380px;
+  cursor:pointer;
+  /* slight tilt matching the photo */
+  transform:rotate(-2.5deg);
+  filter: drop-shadow(0 28px 70px rgba(0,0,0,0.92)) drop-shadow(0 8px 20px rgba(0,0,0,0.7));
+  transition:filter 0.4s ease, transform 0.5s ease;
+  opacity:0; animation:fadeUp 1.2s ease 0.9s forwards;
+}
+
+.env:hover {
+  transform:rotate(-2.5deg) translateY(-7px);
+  filter: drop-shadow(0 38px 90px rgba(0,0,0,0.92)) drop-shadow(0 8px 20px rgba(0,0,0,0.7)) drop-shadow(0 0 50px rgba(201,164,77,0.1));
+}
+
+.env-svg { width:100%; display:block; }
+
+/* Flap that flips open */
+#flap {
+  transform-origin:190px 0px;
+  transition:transform 1s cubic-bezier(0.4,0,0.2,1);
+}
+.env.opening #flap { transform:rotateX(180deg); }
+
+/* Wax seal */
+.seal {
+  position:absolute;
+  top:30%; left:50%;
+  transform:translateX(-50%);
+  width:82px; height:82px;
+  z-index:10;
+  transition:opacity 0.45s ease 0.05s, transform 0.45s ease 0.05s;
+}
+.env.opening .seal {
+  opacity:0;
+  transform:translateX(-50%) scale(0.68);
+}
+
+/* ---- BELOW TEXT ---- */
+.below {
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  margin-top:48px;
+  opacity:0; animation:fadeUp 1s ease 1.6s forwards;
+}
+.below-hint  { font-size:10px; letter-spacing:4px; text-transform:uppercase; color:rgba(201,164,77,0.42); }
+.below-arrow { font-size:16px; color:rgba(201,164,77,0.38); animation:bob 1.8s ease infinite; }
+
+@keyframes bob  { 0%,100%{transform:translateY(0);opacity:.38} 50%{transform:translateY(5px);opacity:.65} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(26px)} to{opacity:1;transform:translateY(0)} }
+
+/* ============================================================
+   MAIN SITE
+============================================================ */
+#site { opacity:0; transition:opacity 1.3s ease; }
+#site.on { opacity:1; }
+
+/* grain */
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9001;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='.035'/%3E%3C/svg%3E");
+  opacity:.4;
+}
+
+/* NAV */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:500;
+  padding:22px 56px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(11,11,12,.97),transparent);
+}
+.nav-logo {
+  font-family:'Poppins',sans-serif; font-weight:700;
+  font-size:12px; letter-spacing:6px; text-transform:uppercase;
+  color:var(--offwhite);
+}
+
+/* BUTTON — gold only (10%) */
+.btn {
+  display:inline-block; padding:13px 38px;
+  background:var(--gold); color:var(--black);
+  font-size:10px; font-weight:700; letter-spacing:4px; text-transform:uppercase;
+  text-decoration:none; border:none; cursor:pointer;
+  position:relative; overflow:hidden;
+  transition:box-shadow .3s ease, transform .3s ease;
+}
+.btn::after {
+  content:''; position:absolute; inset:0;
+  background:rgba(255,255,255,.13); transform:translateX(-100%);
+  transition:transform .3s ease;
+}
+.btn:hover::after { transform:translateX(0); }
+.btn:hover { box-shadow:0 8px 40px rgba(201,164,77,.4); transform:translateY(-1px); }
+
+/* ============================================================
+   SHARED TYPOGRAPHY
+============================================================ */
+.lbl {
+  font-size:9px; font-weight:700; letter-spacing:5px; text-transform:uppercase;
+  color:var(--green2); display:flex; align-items:center; gap:12px; margin-bottom:14px;
+}
+.lbl::before { content:''; width:24px; height:1px; background:var(--green2); }
+.lbl-c { justify-content:center; }
+.lbl-c::before, .lbl-c::after { content:''; width:24px; height:1px; background:var(--green2); }
+
+.ht {
+  font-family:'Poppins',sans-serif; font-weight:500;
+  font-size:clamp(28px,3.8vw,50px); line-height:1.1; letter-spacing:-.4px;
+  margin-bottom:18px;
+}
+.ht em { font-style:italic; font-family:Georgia,serif; color:var(--green2); }
+
+.bt { font-size:15px; line-height:1.65; max-width:600px; }
+
+/* ============================================================
+   HERO — dark (black)
+============================================================ */
+.hero {
+  min-height:100vh; color:var(--offwhite);
+  background:
+    radial-gradient(ellipse at 12% 65%, rgba(22,60,46,.45) 0%, transparent 55%),
+    radial-gradient(ellipse at 88% 20%, rgba(22,60,46,.15) 0%, transparent 50%),
+    var(--black);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:110px 24px 80px;
+  position:relative; overflow:hidden;
+}
+.hero::before {
+  content:''; position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(90deg,rgba(22,60,46,.05) 0,transparent 1px,transparent 100px),
+    repeating-linear-gradient(0deg, rgba(22,60,46,.05) 0,transparent 1px,transparent 100px);
+}
+.hero-badge {
+  display:inline-flex; align-items:center; gap:12px;
+  border:1px solid rgba(201,164,77,.25); padding:9px 22px; margin-bottom:52px;
+  font-size:9px; letter-spacing:5px; text-transform:uppercase; color:var(--gold);
+  opacity:0; animation:fadeUp 1s ease .2s forwards;
+}
+.bdot { width:5px; height:5px; background:var(--gold); border-radius:50%; animation:dp 2s ease infinite; }
+@keyframes dp { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.6)} }
+
+.hero .ht { color:var(--offwhite); font-size:clamp(36px,5.5vw,64px); max-width:840px; opacity:0; animation:fadeUp 1s ease .45s forwards; }
+.hero .ht em { color:var(--green2); }
+.hero .bt  { color:rgba(240,237,228,.5); margin:0 auto 52px; opacity:0; animation:fadeUp 1s ease .65s forwards; }
+.hero-cta  { opacity:0; animation:fadeUp 1s ease .85s forwards; }
+
+.hero-scroll {
+  position:absolute; bottom:44px; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  opacity:0; animation:fadeUp 1s ease 1.2s forwards;
+}
+.s-bar { width:1px; height:52px; background:linear-gradient(to bottom,rgba(201,164,77,.6),transparent); animation:sd 2s ease infinite; }
+.s-lbl { font-size:8px; letter-spacing:4px; color:rgba(201,164,77,.3); text-transform:uppercase; }
+@keyframes sd { 0%{transform-origin:top;transform:scaleY(1);opacity:1} 80%{opacity:0} 100%{transform:scaleY(.3);opacity:0} }
+
+/* dividers */
+.div-g { width:100%; height:1px; background:linear-gradient(to right,transparent,rgba(22,60,46,.35),transparent); }
+
+/* ============================================================
+   HONEST — light (off-white)
+============================================================ */
+.honest { background:var(--offwhite); padding:120px 24px; text-align:center; color:var(--black); }
+.honest-inner { max-width:720px; margin:0 auto; }
+.honest .lbl { color:var(--green); }
+.honest .lbl::before, .honest .lbl::after { background:var(--green); }
+.pull-q {
+  font-family:Georgia,serif; font-style:italic;
+  font-size:clamp(18px,2.6vw,27px); line-height:1.55; color:var(--black);
+  margin:36px auto; padding:0 28px; position:relative; max-width:640px;
+}
+.pull-q::before {
+  content:'\201C'; position:absolute; top:-20px; left:4px;
+  font-size:80px; line-height:1; color:var(--green); opacity:.18; font-family:Georgia,serif;
+}
+.honest .bt { color:rgba(11,11,12,.5); margin:0 auto; }
+
+/* ============================================================
+   BENEFITS — dark
+============================================================ */
+.benefits { background:var(--black2); padding:120px 24px; color:var(--offwhite); }
+.benefits-inner { max-width:1100px; margin:0 auto; }
+.benefits .ht { color:var(--offwhite); }
+.benefits .bt { color:rgba(240,237,228,.42); }
+
+.b-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:1px; margin-top:64px;
+  background:rgba(22,60,46,.18); border:1px solid rgba(22,60,46,.22);
+}
+@media(max-width:900px){.b-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.b-grid{grid-template-columns:1fr}}
+
+.bc {
+  background:#0d0d0c; padding:42px 34px;
+  position:relative; overflow:hidden; transition:background .4s ease;
+}
+.bc::before {
+  content:''; position:absolute; top:0; left:0;
+  width:100%; height:2px; background:var(--green2);
+  transform:scaleX(0); transform-origin:left; transition:transform .4s ease;
+}
+.bc:hover { background:rgba(22,60,46,.1); }
+.bc:hover::before { transform:scaleX(1); }
+.bc-n { font-size:9px; letter-spacing:3px; color:var(--green2); font-weight:600; margin-bottom:14px; }
+.bc-t { font-family:'Poppins',sans-serif; font-weight:600; font-size:15px; color:var(--offwhite); margin-bottom:10px; line-height:1.35; }
+.bc-d { font-size:13.5px; line-height:1.7; color:rgba(240,237,228,.38); }
+
+/* ============================================================
+   FOUNDERS — light
+============================================================ */
+.founders { background:var(--offwhite2); padding:120px 24px; color:var(--black); }
+.founders-inner { max-width:1100px; margin:0 auto; }
+.founders .ht { color:var(--black); }
+.founders .bt { color:rgba(11,11,12,.48); }
+.founders .lbl { color:var(--green); }
+.founders .lbl::before { background:var(--green); }
+
+.f-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:60px; }
+@media(max-width:680px){.f-grid{grid-template-columns:1fr}}
+
+.fc {
+  padding:44px 38px; border:1px solid rgba(22,60,46,.16);
+  background:rgba(255,255,255,.4); position:relative; overflow:hidden;
+  transition:background .3s ease;
+}
+.fc:hover { background:rgba(255,255,255,.65); }
+.fc::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--green); }
+
+.f-i { width:52px; height:52px; background:var(--green); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; color:var(--offwhite); margin-bottom:20px; }
+.f-n { font-family:'Poppins',sans-serif; font-weight:700; font-size:18px; color:var(--black); margin-bottom:4px; }
+.f-r { font-size:9px; letter-spacing:3px; color:var(--green2); text-transform:uppercase; font-weight:600; margin-bottom:16px; }
+.f-b { font-size:14px; line-height:1.7; color:rgba(11,11,12,.52); }
+
+/* ============================================================
+   ORIGIN — dark
+============================================================ */
+.origin { background:var(--black); padding:120px 24px; color:var(--offwhite); }
+.origin-inner { max-width:700px; margin:0 auto; }
+.origin .ht { color:var(--offwhite); }
+.origin .bt { color:rgba(240,237,228,.43); }
+
+.qb { border-left:2px solid var(--green2); padding:22px 30px; margin:44px 0; background:rgba(22,60,46,.07); }
+.qb p { font-family:Georgia,serif; font-style:italic; font-size:18px; line-height:1.65; color:var(--offwhite); margin-bottom:10px; }
+.qb cite { font-size:9px; letter-spacing:2px; color:var(--green2); text-transform:uppercase; font-style:normal; font-weight:600; }
+
+/* ============================================================
+   WHY — light
+============================================================ */
+.why { background:var(--offwhite); padding:120px 24px; color:var(--black); }
+.why-inner { max-width:1100px; margin:0 auto; }
+.why .ht { color:var(--black); }
+.why .lbl { color:var(--green); }
+.why .lbl::before { background:var(--green); }
+
+.why-grid { display:grid; grid-template-columns:1fr 1fr; margin-top:60px; border:1px solid rgba(22,60,46,.16); }
+@media(max-width:580px){.why-grid{grid-template-columns:1fr}}
+
+.wc { padding:44px 38px; }
+.wc:first-child { border-right:1px solid rgba(22,60,46,.16); background:rgba(11,11,12,.025); }
+.wc:last-child  { background:rgba(22,60,46,.04); }
+.wt { font-size:9px; letter-spacing:4px; text-transform:uppercase; font-weight:700; margin-bottom:28px; }
+.wc:first-child .wt { color:rgba(11,11,12,.22); }
+.wc:last-child  .wt { color:var(--green2); }
+
+.wl { list-style:none; }
+.wl li {
+  display:flex; align-items:flex-start; gap:14px;
+  font-size:14px; line-height:1.6; color:rgba(11,11,12,.52);
+  padding:12px 0; border-bottom:1px solid rgba(22,60,46,.09);
+}
+.wl li::before { content:''; min-width:5px; height:5px; border-radius:50%; margin-top:8px; flex-shrink:0; }
+.wc:first-child .wl li::before { background:rgba(11,11,12,.13); }
+.wc:last-child  .wl li::before { background:var(--green2); }
+
+/* ============================================================
+   FAQ — dark
+============================================================ */
+.faq { background:var(--black2); padding:120px 24px; color:var(--offwhite); }
+.faq-inner { max-width:720px; margin:0 auto; }
+.faq .ht { color:var(--offwhite); }
+
+.fi { border-bottom:1px solid rgba(22,60,46,.18); }
+.fq {
+  width:100%; background:none; border:none; padding:24px 0;
+  display:flex; align-items:center; justify-content:space-between; gap:20px;
+  cursor:pointer; font-family:'Poppins',sans-serif; font-size:15px; font-weight:600;
+  color:var(--offwhite); text-align:left; transition:color .3s ease;
+}
+.fq:hover { color:var(--green2); }
+.ficon {
+  width:26px; height:26px; border:1px solid rgba(22,60,46,.4);
+  flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  font-size:18px; color:var(--green2);
+  transition:transform .4s ease, background .3s ease;
+}
+.fi.open .ficon { transform:rotate(45deg); background:rgba(22,60,46,.2); }
+.fa { max-height:0; overflow:hidden; transition:max-height .5s cubic-bezier(.4,0,.2,1); }
+.fi.open .fa { max-height:280px; }
+.fa p { font-size:14px; line-height:1.7; color:rgba(240,237,228,.43); padding-bottom:28px; }
+
+/* ============================================================
+   CTA — dark green radial
+============================================================ */
+.cta {
+  padding:160px 24px; text-align:center; color:var(--offwhite);
+  background:radial-gradient(ellipse at center,rgba(22,60,46,.4) 0%,transparent 65%),var(--black);
+  border-top:1px solid rgba(22,60,46,.2); position:relative; overflow:hidden;
+}
+.cta-bg {
+  position:absolute; font-size:clamp(120px,22vw,320px); font-weight:700;
+  color:rgba(22,60,46,.05); top:50%; left:50%; transform:translate(-50%,-50%);
+  font-family:'Poppins',sans-serif; pointer-events:none; letter-spacing:-10px; white-space:nowrap;
+}
+.cta .ht { color:var(--offwhite); position:relative; }
+.cta .ht em { color:var(--green2); }
+.cta-sub { font-size:15px; color:rgba(240,237,228,.43); max-width:460px; margin:0 auto 52px; line-height:1.65; position:relative; }
+.cta-note { margin-top:22px; font-size:10px; letter-spacing:3px; color:rgba(240,237,228,.14); text-transform:uppercase; }
+
+/* FOOTER */
+footer {
+  background:var(--black); padding:34px 56px;
+  border-top:1px solid rgba(22,60,46,.18);
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
+}
+.fl { font-family:'Poppins',sans-serif; font-weight:700; font-size:12px; letter-spacing:5px; text-transform:uppercase; color:var(--offwhite); }
+.fc2 { font-size:11px; letter-spacing:1px; color:rgba(240,237,228,.18); }
+
+/* scroll reveal */
+.rv { opacity:0; transform:translateY(30px); transition:opacity .8s ease, transform .8s ease; }
+.rv.on { opacity:1; transform:translateY(0); }
+.d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s}
+.d4{transition-delay:.4s} .d5{transition-delay:.5s} .d6{transition-delay:.6s}
+
+@media(max-width:640px){
+  nav{padding:18px 20px}
+  footer{padding:28px 20px}
+  .fc,.wc{padding:32px 22px}
+  .env{width:300px}
+}
+</style>
+</head>
+<body>
+
+<!-- =============================================
+     INTRO — ENVELOPE
+============================================= -->
+<div id="intro">
+
+  <!-- TEXT ABOVE ENVELOPE -->
+  <div class="above">
+    <div class="above-rule"></div>
+    <p class="above-txt">A Private Invitation Awaits You</p>
+    <div class="above-rule"></div>
+  </div>
+
+  <!-- ENVELOPE — plain, no text on the envelope body -->
+  <div class="env" id="envEl" onclick="openEnv()">
+
+    <svg class="env-svg" viewBox="0 0 380 266" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Parchment paper — warm cream, slightly uneven -->
+        <linearGradient id="paper" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%"   stop-color="#eee8d8"/>
+          <stop offset="45%"  stop-color="#e6e0ce"/>
+          <stop offset="100%" stop-color="#d9d3c1"/>
+        </linearGradient>
+        <!-- Left side triangle darkening -->
+        <linearGradient id="lshade" x1="0" y1="0.5" x2="1" y2="0.5">
+          <stop offset="0%"   stop-color="#b8b2a0" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </linearGradient>
+        <!-- Right side triangle darkening -->
+        <linearGradient id="rshade" x1="1" y1="0.5" x2="0" y2="0.5">
+          <stop offset="0%"   stop-color="#b4ae9c" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </linearGradient>
+        <!-- Bottom triangle darkening -->
+        <linearGradient id="bshade" x1="0.5" y1="1" x2="0.5" y2="0">
+          <stop offset="0%"   stop-color="#b0aa98" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </linearGradient>
+        <!-- Top flap -->
+        <linearGradient id="flapFill" x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%"   stop-color="#eae4d3"/>
+          <stop offset="100%" stop-color="#d6d0be"/>
+        </linearGradient>
+        <!-- Sheen on flap -->
+        <linearGradient id="flapSheen" x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%"   stop-color="white" stop-opacity="0.2"/>
+          <stop offset="65%"  stop-color="white" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+
+      <!-- 1. Paper base -->
+      <rect x="0" y="0" width="380" height="266" rx="2" fill="url(#paper)"/>
+
+      <!-- 2. Side & bottom flap shading (triangle overlays) -->
+      <polygon points="0,0 0,266 190,148"   fill="url(#lshade)"/>
+      <polygon points="380,0 380,266 190,148" fill="url(#rshade)"/>
+      <polygon points="0,266 380,266 190,148" fill="url(#bshade)"/>
+
+      <!-- 3. Crease lines -->
+      <line x1="0"   y1="0"   x2="190" y2="148" stroke="#9a9484" stroke-width="0.7" opacity="0.55"/>
+      <line x1="380" y1="0"   x2="190" y2="148" stroke="#9a9484" stroke-width="0.7" opacity="0.55"/>
+      <line x1="0"   y1="266" x2="190" y2="148" stroke="#9a9484" stroke-width="0.5" opacity="0.4"/>
+      <line x1="380" y1="266" x2="190" y2="148" stroke="#9a9484" stroke-width="0.5" opacity="0.4"/>
+
+      <!-- 4. Outer envelope border -->
+      <rect x="0" y="0" width="380" height="266" rx="2" fill="none" stroke="#9a9282" stroke-width="0.9" opacity="0.5"/>
+
+      <!-- 5. TOP FLAP — animates open on click -->
+      <g id="flap" style="transform-origin:190px 0px; transition:transform 1s cubic-bezier(.4,0,.2,1)">
+        <polygon points="0,0 380,0 190,145" fill="url(#flapFill)"/>
+        <polygon points="0,0 380,0 190,145" fill="url(#flapSheen)"/>
+        <!-- Flap fold lines -->
+        <line x1="0"   y1="0" x2="190" y2="145" stroke="#8c8676" stroke-width="0.9" opacity="0.55"/>
+        <line x1="380" y1="0" x2="190" y2="145" stroke="#8c8676" stroke-width="0.9" opacity="0.55"/>
+        <line x1="0"   y1="0" x2="380" y2="0"   stroke="#9a9282" stroke-width="0.7" opacity="0.4"/>
+      </g>
+    </svg>
+
+    <!-- WAX SEAL — large, brass gold, centered on flap seam -->
+    <div class="seal" id="sealEl">
+      <svg viewBox="0 0 82 82" xmlns="http://www.w3.org/2000/svg"
+           style="width:82px;height:82px;filter:drop-shadow(0 5px 16px rgba(0,0,0,0.6)) drop-shadow(0 2px 6px rgba(0,0,0,0.45))">
+        <defs>
+          <radialGradient id="wax" cx="34%" cy="29%" r="70%">
+            <stop offset="0%"   stop-color="#dcb133"/>
+            <stop offset="28%"  stop-color="#ba8e19"/>
+            <stop offset="62%"  stop-color="#96700b"/>
+            <stop offset="100%" stop-color="#6c4e08"/>
+          </radialGradient>
+          <radialGradient id="wax2" cx="38%" cy="33%" r="56%">
+            <stop offset="0%"   stop-color="#f0ca4a" stop-opacity="0.24"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Organic wax blob — irregular like real dripped wax -->
+        <path d="
+          M41 3.5
+          C47.5 3.5, 58.5 7, 64.5 14.5
+          C71.5 22.5, 75 33, 73.5 42
+          C72 51.5, 66 61.5, 57.5 67.5
+          C49.5 73.5, 39.5 76, 30.5 74
+          C21.5 72, 13 66, 8 57.5
+          C3 49, 2.5 38, 6.5 29
+          C11 19, 20 10, 29.5 5.5
+          C33 4, 37 3.5, 41 3.5Z"
+          fill="url(#wax)"/>
+        <path d="
+          M41 3.5
+          C47.5 3.5, 58.5 7, 64.5 14.5
+          C71.5 22.5, 75 33, 73.5 42
+          C72 51.5, 66 61.5, 57.5 67.5
+          C49.5 73.5, 39.5 76, 30.5 74
+          C21.5 72, 13 66, 8 57.5
+          C3 49, 2.5 38, 6.5 29
+          C11 19, 20 10, 29.5 5.5
+          C33 4, 37 3.5, 41 3.5Z"
+          fill="url(#wax2)"/>
+
+        <!-- Embossed rings -->
+        <circle cx="41" cy="40" r="25" fill="none" stroke="rgba(215,170,42,.45)" stroke-width="1.1"/>
+        <circle cx="41" cy="40" r="21" fill="none" stroke="rgba(215,170,42,.22)" stroke-width="0.6"/>
+
+        <!-- 8 ring dots (stamped pattern) -->
+        <circle cx="41"    cy="16.5" r="1.4" fill="rgba(255,215,70,.48)"/>
+        <circle cx="59.5"  cy="22.5" r="1.4" fill="rgba(255,215,70,.48)"/>
+        <circle cx="66.5"  cy="41"   r="1.4" fill="rgba(255,215,70,.48)"/>
+        <circle cx="57.5"  cy="59.5" r="1.4" fill="rgba(255,215,70,.48)"/>
+        <circle cx="41"    cy="65.5" r="1.4" fill="rgba(255,215,70,.48)"/>
+        <circle cx="23"    cy="59.5" r="1.4" fill="rgba(255,215,70,.48)"/>
+        <circle cx="15.5"  cy="41"   r="1.4" fill="rgba(255,215,70,.48)"/>
+        <circle cx="22.5"  cy="22.5" r="1.4" fill="rgba(255,215,70,.48)"/>
+
+        <!-- TC embossed -->
+        <text x="41" y="47"
+              text-anchor="middle"
+              font-family="'Poppins',sans-serif"
+              font-size="16" font-weight="700" letter-spacing="2.5"
+              fill="rgba(255,245,200,.88)">TC</text>
+
+        <!-- Specular glint -->
+        <ellipse cx="31" cy="24" rx="10" ry="5"
+                 fill="rgba(255,248,190,.13)"
+                 transform="rotate(-28,31,24)"/>
+      </svg>
+    </div>
+
+  </div><!-- /env -->
+
+  <!-- TEXT BELOW ENVELOPE -->
+  <div class="below">
+    <p class="below-hint">Click the seal to open</p>
+    <div class="below-arrow">↓</div>
+  </div>
+
+</div><!-- /#intro -->
+
+
+<!-- =============================================
+     MAIN SITE
+============================================= -->
+<div id="site">
+
+  <nav>
+    <div class="nav-logo">The Collective</div>
+    <a href="#apply" class="btn" style="padding:11px 26px;font-size:9px;letter-spacing:3px">Apply Now</a>
+  </nav>
+
+  <!-- HERO — dark -->
+  <section class="hero">
+    <div class="hero-badge">
+      <div class="bdot"></div>
+      Invite Only &nbsp;·&nbsp; Est. 2026 &nbsp;·&nbsp; Mission Driven
+      <div class="bdot"></div>
+    </div>
+
+    <h1 class="ht" style="max-width:840px;font-size:clamp(36px,5.5vw,64px)">
+      You're One Content Away From<br><em>Changing Someone's Life.</em>
+    </h1>
+
+    <p class="bt" style="color:rgba(240,237,228,.5);max-width:520px;margin:0 auto 52px">
+      An invite-only challenge community for serious business founders ready to build real visibility, real credibility, and real impact — 45 days at a time.
+    </p>
+
+    <div class="hero-cta"><a href="#apply" class="btn">Apply for Your Invitation</a></div>
+
+    <div class="hero-scroll">
+      <div class="s-bar"></div>
+      <div class="s-lbl">Scroll</div>
+    </div>
+  </section>
+
+  <!-- HONEST — light -->
+  <section class="honest">
+    <div class="honest-inner rv">
+      <div class="lbl lbl-c">Let's Be Honest for a Second</div>
+      <div class="pull-q">
+        You already know you should be posting. You know visibility builds trust. You know credibility closes deals.
+      </div>
+      <p class="bt" style="margin-bottom:18px">
+        But life gets in the way. You post once, maybe twice, and then it stops. Not because you are lazy — but because you are doing it alone, without accountability, without a clear purpose, and without people who actually show up alongside you.
+      </p>
+      <p class="bt">We have all been there. And that is exactly why The Collective exists.</p>
+    </div>
+  </section>
+
+  <div class="div-g"></div>
+
+  <!-- BENEFITS — dark -->
+  <section class="benefits">
+    <div class="benefits-inner">
+      <div class="lbl rv">What You Will Get</div>
+      <h2 class="ht rv">When You Step Inside<br><em>The Collective</em></h2>
+      <p class="bt rv" style="color:rgba(240,237,228,.42)">You do not just join a group chat. You step into a structured, mission-driven community built around showing up, growing together, and creating real impact.</p>
+
+      <div class="b-grid">
+        <div class="bc rv d1"><div class="bc-n">01</div><div class="bc-t">45-Day Content Challenge</div><div class="bc-d">Build visibility, credibility, and consistency through a clear system with a community that holds you to a higher standard.</div></div>
+        <div class="bc rv d2"><div class="bc-n">02</div><div class="bc-t">Podcast Exposure</div><div class="bc-d">Featured as an operator sharing your insights. No pitching — pure positioning that builds warm trust at scale before anyone reaches out.</div></div>
+        <div class="bc rv d3"><div class="bc-n">03</div><div class="bc-t">Collaboration Threads</div><div class="bc-d">Find aligned partners, referral opportunities, and strategic alliances with serious founders here to build — not browse.</div></div>
+        <div class="bc rv d4"><div class="bc-n">04</div><div class="bc-t">Mission-Driven Streak System</div><div class="bc-d">Missed days contribute to meaningful causes. Accountability here has a purpose beyond keeping a streak alive.</div></div>
+        <div class="bc rv d5"><div class="bc-n">05</div><div class="bc-t">Awards & Recognition</div><div class="bc-d">The Posterity and Legacy Awards celebrate founders who show up consistently. Your presence is documented and recognized.</div></div>
+        <div class="bc rv d6"><div class="bc-n">06</div><div class="bc-t">The Collective Circle</div><div class="bc-d">An invite-only network of serious founders. Limited access means serious people inside — real opportunities, not noise.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="div-g"></div>
+
+  <!-- FOUNDERS — light -->
+  <section class="founders">
+    <div class="founders-inner">
+      <div class="lbl rv">The Co-Founders</div>
+      <h2 class="ht rv">Built by Founders,<br><em>For Founders</em></h2>
+      <p class="bt rv">They did not build The Collective to become influencers. They built it because they genuinely believe one intentional piece of content can change a life — maybe yours, or the life of someone who finds your post at exactly the right moment.</p>
+
+      <div class="f-grid">
+        <div class="fc rv d1">
+          <div class="f-i">K</div>
+          <div class="f-n">Kerby</div>
+          <div class="f-r">Co-Founder · Visionary</div>
+          <div class="f-b">Fiercely patriotic with a long-term vision of helping the Philippines become a first-world country — one empowered entrepreneur at a time. His conviction: visibility is the first step to national transformation.</div>
+        </div>
+        <div class="fc rv d2">
+          <div class="f-i">J</div>
+          <div class="f-n">Jez</div>
+          <div class="f-r">Co-Founder · Architect</div>
+          <div class="f-b">On a mission to develop transformational leaders who do not just build businesses, but build people. Jez was the first to actually post — lighting the spark that became The Collective.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ORIGIN — dark -->
+  <section class="origin">
+    <div class="origin-inner">
+      <div class="lbl rv">The Origin Story</div>
+      <h2 class="ht rv">How <em>The Collective</em><br>Was Born</h2>
+      <div class="qb rv">
+        <p>"You're one content away to change your life."</p>
+        <cite>— Alec Cuenca, Take Off Summit</cite>
+      </div>
+      <p class="bt rv" style="color:rgba(240,237,228,.43);margin-bottom:18px">On a call shortly after, Kerby suggested a small but meaningful tweak: <em style="color:var(--green2);font-style:italic">"We're one content away to change one's life."</em> One word changed — and the whole mission shifted from personal gain to collective impact.</p>
+      <p class="bt rv" style="color:rgba(240,237,228,.43);margin-bottom:18px">During that same call, Kerby nudged Jonathan to start posting. Jez jumped in and became the first to actually post — lighting the spark for everyone else. What started as a simple nudge became something far bigger than any of them originally planned.</p>
+      <p class="bt rv" style="color:rgba(240,237,228,.43)">Not from a polished business plan. From a real moment of conviction shared between founders who refused to stay invisible.</p>
+    </div>
+  </section>
+
+  <!-- WHY — light -->
+  <section class="why">
+    <div class="why-inner">
+      <div class="lbl rv">Clarity</div>
+      <h2 class="ht rv">Who This Is<br><em>Built For</em></h2>
+      <div class="why-grid rv">
+        <div class="wc">
+          <div class="wt">This Is Not For</div>
+          <ul class="wl">
+            <li>Beginners looking for free leads</li>
+            <li>Content coaching programs</li>
+            <li>Groups where people post once and go quiet</li>
+            <li>Those without a real business behind their name</li>
+          </ul>
+        </div>
+        <div class="wc">
+          <div class="wt">This Is For</div>
+          <ul class="wl">
+            <li>Established founders building visibility without spamming</li>
+            <li>Founders who want real strategic partnerships</li>
+            <li>People showing up for a mission bigger than themselves</li>
+            <li>Founders recognized for consistency and purpose</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ — dark -->
+  <section class="faq">
+    <div class="faq-inner">
+      <div class="lbl rv">Common Questions</div>
+      <h2 class="ht rv" style="margin-bottom:52px">Everything You<br><em>Need to Know</em></h2>
+
+      <div class="fi rv"><button class="fq" onclick="tFaq(this)">Who can join The Collective?<div class="ficon">+</div></button><div class="fa"><p>Established business owners and operators committed to 45 days of intentional, mission-driven content. If you are a beginner or looking for free leads, this is not the right fit — and that is completely okay.</p></div></div>
+      <div class="fi rv"><button class="fq" onclick="tFaq(this)">Is this a content coaching program?<div class="ficon">+</div></button><div class="fa"><p>No. Content is the vehicle, not the destination. The community is built around credibility, collaboration, and impact. The 45-day challenge is the discipline that makes everything else possible.</p></div></div>
+      <div class="fi rv"><button class="fq" onclick="tFaq(this)">What happens if I miss a day?<div class="ficon">+</div></button><div class="fa"><p>Missed days contribute to meaningful causes — charity, small content creators, or micro-support projects. Accountability here has a purpose beyond just keeping a streak alive.</p></div></div>
+      <div class="fi rv"><button class="fq" onclick="tFaq(this)">What is the value of being on the podcast?<div class="ficon">+</div></button><div class="fa"><p>It positions you as an operator with a story worth hearing. Other founders, future partners, even future investors get to know you before they ever reach out. Warm trust built at scale.</p></div></div>
+      <div class="fi rv"><button class="fq" onclick="tFaq(this)">Is there a cost to join?<div class="ficon">+</div></button><div class="fa"><p>Phase 1 is free and strictly invite-only. The real investment is your consistency, your commitment, and your content. The return is the network, the visibility, and the impact you create.</p></div></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="apply">
+    <div class="cta-bg">TC</div>
+    <div class="lbl rv lbl-c" style="position:relative">Your Invitation</div>
+    <h2 class="ht rv" style="position:relative">Not Everyone<br><em>Gets One.</em></h2>
+    <p class="cta-sub rv">If you are a serious founder ready to show up, build something meaningful, and be part of a community that holds you to a higher standard — we would love to have you apply.</p>
+    <a href="#" class="btn rv">Apply for Your Invitation</a>
+    <p class="cta-note rv">Limited Invite Only · Phase 1 is Free · Spots Are Limited</p>
+  </section>
+
+  <footer>
+    <div class="fl">The Collective</div>
+    <div class="fc2">Invite Only · Founder Visibility · Est. 2026</div>
+    <div class="fc2">© 2026 The Collective. All rights reserved.</div>
+  </footer>
+
+</div><!-- /#site -->
+
+<script>
+  document.body.style.overflow = 'hidden';
+
+  function openEnv() {
+    const env  = document.getElementById('envEl');
+    const flap = document.getElementById('flap');
+    const seal = document.getElementById('sealEl');
+
+    // Flip flap open
+    flap.style.transform = 'rotateX(180deg)';
+
+    // Fade + shrink seal
+    seal.style.transition = 'opacity .4s ease .05s, transform .4s ease .05s';
+    seal.style.opacity    = '0';
+    seal.style.transform  = 'translateX(-50%) scale(.65)';
+
+    // Lift envelope slightly
+    env.style.transition = 'transform .6s ease';
+    env.style.transform  = 'rotate(-2.5deg) translateY(-10px)';
+
+    setTimeout(() => {
+      document.getElementById('intro').classList.add('gone');
+      document.getElementById('site').classList.add('on');
+      document.body.style.overflow = 'auto';
+    }, 1750);
+  }
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(
+    entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on'); }),
+    { threshold: .08 }
+  );
+  document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+
+  // FAQ
+  function tFaq(btn) {
+    const item = btn.closest('.fi');
+    const was  = item.classList.contains('open');
+    document.querySelectorAll('.fi.open').forEach(el => el.classList.remove('open'));
+    if(!was) item.classList.add('open');
+  }
+</script>
+</body>
+</html>
