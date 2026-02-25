@@ -1161,10 +1161,11 @@
         <div class="ghl-form-container">
           <iframe
             src="https://link.funnelgenie.io/widget/form/jnS5rvxGloP7WtaDCUVS?notrack=true"
-            style="width:100%; min-height:560px; border:none; background:transparent;"
+            style="width:100%; height:480px; border:none; background:transparent; display:block;"
             scrolling="no"
             id="ghl-form-iframe"
             title="Waitlist Application Form"
+            onload="this.style.height = this.contentWindow.document.body.scrollHeight + 'px'"
           ></iframe>
         </div>
         <p class="form-disclaimer" style="margin-top:24px;">
@@ -1219,6 +1220,16 @@
       document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
       if (!isOpen) item.classList.add('open');
     }
+
+    /* GHL iframe auto-resize */
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'iframeResize') {
+        const iframe = document.getElementById('ghl-form-iframe');
+        if (iframe && e.data.height) {
+          iframe.style.height = e.data.height + 'px';
+        }
+      }
+    });
 
     /* Smooth anchor nav */
     document.querySelectorAll('a[href^="#"]').forEach(a => {
