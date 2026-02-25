@@ -1,704 +1,215 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>The Collective Waitlist</title>
-
-  <!--
-    COLORS (from your system)
-    60% Black/White: #0B0B0C / #EA66DF (your "Off-White")
-    30% Deep Forest Green: #163C2E
-    10% Goldenrod: #C9A44D
-  -->
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Collective | Paving Period</title>
+  <!-- Assume your CSS is linked here; e.g. <link rel="stylesheet" href="styles.css"> -->
   <style>
-    :root{
-      --black: #0B0B0C;
-      --green: #163C2E;
-      --gold:  #C9A44D;
-      --offwhite:#EA66DF;
-      --grey:  #2A2AAA;
-
-      /* FONT STACKS (web-safe fallbacks; self-host your brand fonts for exact match) */
-      --headline: "Futura", "Futura PT", "Avenir Next", "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      --system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "San Francisco", "Segoe UI", Roboto, Arial, sans-serif;
-      --body: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      --italic: "Dutch 766 Italic", "Georgia", "Times New Roman", serif;
-
-      --radius: 18px;
-      --shadow: 0 18px 50px rgba(0,0,0,.55);
-      --border: 1px solid rgba(201,164,77,.32);
-    }
-
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      background: var(--black);
-      color: var(--offwhite);
-      font-family: var(--body);
-      line-height: 1.6;
-      letter-spacing: 0;
-    }
-
-    /* Layout ratio control:
-       - Page background is black (dominant).
-       - Green sections are exactly 2 of 6 main blocks (about ~30% height depending on content).
-       - Gold is used only for lines, monogram, CTA borders, and small accents. */
-    .wrap{
-      min-height:100vh;
-      display:flex;
-      align-items:stretch;
-      justify-content:center;
-      padding: clamp(16px, 3vw, 40px);
-    }
-
-    .shell{
-      width: min(1080px, 100%);
-      display:grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: clamp(14px, 2.2vw, 28px);
-    }
-
-    @media (max-width: 980px){
-      .shell{grid-template-columns:1fr}
-    }
-
-    .panel{
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      border: 1px solid rgba(255,255,255,.06);
-    }
-
-    /* Left brand panel (Black) */
-    .brand{
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.00)) , var(--black);
-      padding: clamp(18px, 3vw, 42px);
-      position:relative;
-    }
-
-    .monogram{
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      border: 2px solid rgba(201,164,77,.85);
-      display:grid;
-      place-items:center;
-      margin-bottom: 18px;
-      box-shadow: 0 0 0 6px rgba(201,164,77,.08);
-    }
-    .monogram svg{display:block}
-
-    .kicker{
-      font-family: var(--system);
-      font-weight: 600;
-      font-size: 14px;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: rgba(234,102,223,.78);
-      margin: 0 0 10px 0;
-    }
-
-    h1{
-      font-family: var(--headline);
-      font-weight: 500;
-      font-size: clamp(34px, 4.2vw, 64px);
-      line-height: 1.1;
-      letter-spacing: -0.8%;
-      margin: 0 0 14px 0;
-      max-width: 18ch;
-    }
-
-    .sub{
-      font-family: var(--system);
-      font-weight: 600;
-      font-size: clamp(18px, 2vw, 22px);
-      line-height: 1.3;
-      margin: 0 0 18px 0;
-      color: rgba(234,102,223,.88);
-      max-width: 58ch;
-    }
-
-    .rule{
-      height:1px;
-      background: linear-gradient(90deg, rgba(201,164,77,.0), rgba(201,164,77,.85), rgba(201,164,77,.0));
-      margin: 18px 0 18px 0;
-    }
-
-    .bullets{
-      display:grid;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    .bullet{
-      display:flex;
-      gap: 12px;
-      align-items:flex-start;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(201,164,77,.16);
-      background: rgba(255,255,255,.02);
-    }
-    .dot{
-      width:10px;height:10px;border-radius:99px;
-      background: var(--gold);
-      margin-top: 6px;
-      flex: 0 0 auto;
-      box-shadow: 0 0 0 5px rgba(201,164,77,.10);
-    }
-    .bullet strong{
-      font-family: var(--system);
-      font-weight: 600;
-      color: rgba(234,102,223,.92);
-    }
-    .bullet p{
-      margin: 2px 0 0 0;
-      color: rgba(234,102,223,.80);
-      max-width: 66ch;
-      font-size: 15px;
-    }
-
-    .editorial{
-      margin-top: 18px;
-      padding: 16px 16px;
-      border-radius: 16px;
-      border: 1px solid rgba(201,164,77,.22);
-      background: rgba(201,164,77,.06);
-    }
-    .editorial em{
-      font-family: var(--italic);
-      font-style: italic;
-      font-weight: 400;
-      font-size: clamp(20px, 2.2vw, 28px);
-      line-height: 1.1;
-      display:block;
-      color: rgba(234,102,223,.92);
-    }
-
-    /* Right funnel panel uses Green (30%) */
-    .funnel{
-      background: radial-gradient(1200px 450px at 20% 10%, rgba(201,164,77,.12), rgba(0,0,0,0)),
-                  linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.00)),
-                  var(--green);
-      padding: clamp(18px, 3vw, 32px);
-    }
-
-    .card{
-      background: rgba(11,11,12,.72);
-      border: var(--border);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 22px 60px rgba(0,0,0,.55);
-    }
-
-    .stepper{
-      display:flex;
-      gap: 8px;
-      margin-bottom: 14px;
-      align-items:center;
-    }
-    .step{
-      width: 10px; height: 10px; border-radius: 99px;
-      background: rgba(234,102,223,.22);
-      border: 1px solid rgba(201,164,77,.18);
-    }
-    .step.active{
-      background: var(--gold);
-      border-color: rgba(201,164,77,.85);
-      box-shadow: 0 0 0 6px rgba(201,164,77,.12);
-    }
-    .step-label{
-      margin-left:auto;
-      font-family: var(--system);
-      font-weight: 600;
-      font-size: 12px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: rgba(234,102,223,.78);
-    }
-
-    .form-title{
-      font-family: var(--headline);
-      font-weight: 500;
-      font-size: 22px;
-      letter-spacing: -0.5%;
-      margin: 0 0 6px 0;
-      color: rgba(234,102,223,.92);
-    }
-    .form-sub{
-      font-family: var(--system);
-      font-weight: 600;
-      font-size: 14px;
-      margin: 0 0 14px 0;
-      color: rgba(234,102,223,.78);
-      line-height: 1.35;
-    }
-
-    form{display:grid; gap: 12px;}
-    .row{display:grid; grid-template-columns:1fr 1fr; gap: 10px;}
-    @media (max-width: 520px){ .row{grid-template-columns:1fr;} }
-
-    label{
-      display:block;
-      font-family: var(--system);
-      font-weight: 600;
-      font-size: 12px;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: rgba(234,102,223,.72);
-      margin: 0 0 6px 0;
-    }
-
-    input, select, textarea{
-      width:100%;
-      background: rgba(234,102,223,.06);
-      border: 1px solid rgba(234,102,223,.14);
-      color: rgba(234,102,223,.92);
-      border-radius: 14px;
-      padding: 12px 12px;
-      outline: none;
-      font-family: var(--body);
-      font-size: 15px;
-      transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-    }
-    textarea{min-height: 92px; resize: vertical;}
-    input:focus, select:focus, textarea:focus{
-      border-color: rgba(201,164,77,.75);
-      box-shadow: 0 0 0 6px rgba(201,164,77,.12);
-      background: rgba(234,102,223,.08);
-    }
-    ::placeholder{color: rgba(234,102,223,.45);}
-
-    .actions{
-      display:flex;
-      gap: 10px;
-      margin-top: 6px;
-      align-items:center;
-    }
-    .btn{
-      border-radius: 999px;
-      padding: 12px 16px;
-      font-family: var(--system);
-      font-weight: 700;
-      font-size: 13px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      cursor:pointer;
-      transition: transform .08s ease, background .15s ease, border-color .15s ease, color .15s ease;
-      user-select:none;
-    }
-    .btn:active{transform: translateY(1px);}
-
-    /* Gold is only in button outline + hover fill (keeps ~10% usage) */
-    .btn-primary{
-      background: transparent;
-      color: rgba(234,102,223,.92);
-      border: 1px solid rgba(201,164,77,.85);
-    }
-    .btn-primary:hover{
-      background: rgba(201,164,77,.14);
-      border-color: rgba(201,164,77,1);
-    }
-    .btn-secondary{
-      background: transparent;
-      color: rgba(234,102,223,.70);
-      border: 1px solid rgba(234,102,223,.18);
-    }
-    .btn-secondary:hover{
-      border-color: rgba(234,102,223,.28);
-      color: rgba(234,102,223,.85);
-    }
-
-    .fineprint{
-      margin-top: 12px;
-      font-size: 12px;
-      color: rgba(234,102,223,.62);
-      line-height: 1.45;
-    }
-    .fineprint a{
-      color: rgba(201,164,77,.9);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(201,164,77,.35);
-    }
-    .fineprint a:hover{border-bottom-color: rgba(201,164,77,.85);}
-
-    .hidden{display:none}
-
-    .success{
-      padding: 14px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(201,164,77,.28);
-      background: rgba(201,164,77,.10);
-      color: rgba(234,102,223,.92);
-    }
-
-    .metric{
-      display:grid;
-      gap: 6px;
-      margin-top: 10px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(234,102,223,.14);
-      background: rgba(255,255,255,.02);
-    }
-    .metric span{
-      font-family: var(--system);
-      font-weight: 700;
-      font-size: 12px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: rgba(234,102,223,.70);
-    }
-    .metric strong{
-      font-family: var(--headline);
-      font-weight: 500;
-      font-size: 18px;
-      color: rgba(234,102,223,.92);
-    }
-
-    footer{
-      margin-top: 14px;
-      font-family: var(--system);
-      font-weight: 600;
-      font-size: 12px;
-      color: rgba(234,102,223,.52);
-      display:flex;
-      justify-content:space-between;
-      gap: 12px;
-      flex-wrap:wrap;
-    }
+    /* Minimal inline styles for visibility; replace with your full CSS */
+    body { font-family: system-ui, sans-serif; background: #0b0b0c; color: #fff; margin: 0; }
+    .section-inner { max-width: 1200px; margin: 0 auto; padding: 80px 20px; }
+    .headline { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin: 0 0 24px; }
+    .editorial { color: var(--gold, #c9a44d); }
+    .section-label { font-size: 1rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(201,164,77,0.8); margin-bottom: 16px; }
+    .reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    ul { list-style: none; padding: 0; }
+    .btn-submit { background: var(--gold, #c9a44d); color: #000; padding: 16px 32px; border: none; font-weight: bold; cursor: pointer; }
+    footer { background: #000; padding: 60px 20px 20px; text-align: center; }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <div class="shell">
 
-      <!-- BRAND PANEL (Black/White dominant) -->
-      <section class="panel brand" aria-label="Brand">
-        <div class="monogram" aria-hidden="true">
-          <!-- Simple TC crosshair monogram placeholder in gold -->
-          <svg width="34" height="34" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img">
-            <circle cx="32" cy="32" r="22" stroke="rgba(201,164,77,.95)" stroke-width="4"/>
-            <path d="M32 6V58" stroke="rgba(201,164,77,.95)" stroke-width="4" stroke-linecap="round"/>
-            <path d="M6 32H58" stroke="rgba(201,164,77,.35)" stroke-width="4" stroke-linecap="round"/>
-            <path d="M44 32c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12" stroke="rgba(201,164,77,.95)" stroke-width="4" stroke-linecap="round"/>
-          </svg>
-        </div>
-
-        <p class="kicker">Invite Only · Founder Visibility · Est. 2026</p>
-
-        <!-- KEEP COPY AS PROVIDED. You can paste your exact approved copy blocks into these areas. -->
-        <h1>Building the infrastructure of trust, one story at a time.</h1>
-        <p class="sub">An exclusive 45-day sprint to align your professional footprint with the weight of your economic mission.</p>
-
-        <div class="rule"></div>
-
-        <div class="bullets" role="list">
-          <div class="bullet" role="listitem">
-            <div class="dot" aria-hidden="true"></div>
-            <div>
-              <strong>The Disciplined Narrative</strong>
-              <p>A 45-day structured execution plan (The Protocol) designed to extract your deep expertise and turn it into a grounded public presence.</p>
-            </div>
-          </div>
-
-          <div class="bullet" role="listitem">
-            <div class="dot" aria-hidden="true"></div>
-            <div>
-              <strong>The Collective Perspective</strong>
-              <p>Every leader who maintains the protocol is featured on The Collective Podcast as a documented “Archive of Thought.”</p>
-            </div>
-          </div>
-
-          <div class="bullet" role="listitem">
-            <div class="dot" aria-hidden="true"></div>
-            <div>
-              <strong>Strategic Partnership</strong>
-              <p>Access to a curated circle of mission-driven leaders and facilitated collaborations engineered for international progress.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="editorial" aria-label="Editorial Highlight">
-          <em>Shaping Leaders. Advancing Economies.</em>
-        </div>
-
-        <div class="metric" aria-label="Protocol Metric">
-          <span>Daily protocol requirement</span>
-          <strong>30 to 60 minutes</strong>
-        </div>
-      </section>
-
-      <!-- FUNNEL PANEL (Green ~30%) -->
-      <aside class="panel funnel" aria-label="Waitlist Funnel">
-        <div class="card">
-
-          <!-- STEPPER -->
-          <div class="stepper" aria-label="Steps">
-            <div class="step active" id="s1"></div>
-            <div class="step" id="s2"></div>
-            <div class="step" id="s3"></div>
-            <div class="step-label" id="stepLabel">Step 1 of 3</div>
-          </div>
-
-          <!-- STEP 1 -->
-          <section id="step1">
-            <h2 class="form-title">Waitlist Inquiry</h2>
-            <p class="form-sub">This is a screening process. Payment does not guarantee permanence. Completion does.</p>
-
-            <form id="form1" autocomplete="on" novalidate>
-              <div class="row">
-                <div>
-                  <label for="firstName">First Name</label>
-                  <input id="firstName" name="firstName" placeholder="First name" required />
-                </div>
-                <div>
-                  <label for="lastName">Last Name</label>
-                  <input id="lastName" name="lastName" placeholder="Last name" required />
-                </div>
-              </div>
-
-              <div>
-                <label for="email">Email</label>
-                <input id="email" name="email" type="email" placeholder="name@company.com" required />
-              </div>
-
-              <div class="row">
-                <div>
-                  <label for="role">Role</label>
-                  <input id="role" name="role" placeholder="Founder, Operator, Executive" required />
-                </div>
-                <div>
-                  <label for="company">Company</label>
-                  <input id="company" name="company" placeholder="Organization" required />
-                </div>
-              </div>
-
-              <div>
-                <label for="region">Region</label>
-                <select id="region" name="region" required>
-                  <option value="" selected disabled>Select</option>
-                  <option>North America</option>
-                  <option>Europe</option>
-                  <option>Africa</option>
-                  <option>Asia</option>
-                  <option>Middle East</option>
-                  <option>Oceania</option>
-                  <option>South America</option>
-                </select>
-              </div>
-
-              <div class="actions">
-                <button class="btn btn-primary" type="submit">Continue</button>
-              </div>
-
-              <div class="fineprint">
-                By submitting, you agree to Terms &amp; Conditions and Privacy Policy.
-              </div>
-            </form>
-          </section>
-
-          <!-- STEP 2 -->
-          <section id="step2" class="hidden">
-            <h2 class="form-title">Mission and Standards</h2>
-            <p class="form-sub">Answer precisely. Vague inputs reduce acceptance probability.</p>
-
-            <form id="form2" novalidate>
-              <div>
-                <label for="mission">What economic mission are you building?</label>
-                <textarea id="mission" name="mission" placeholder="One paragraph. Concrete outcomes. No slogans." required></textarea>
-              </div>
-
-              <div class="row">
-                <div>
-                  <label for="capacity">Daily capacity for protocol</label>
-                  <select id="capacity" name="capacity" required>
-                    <option value="" selected disabled>Select</option>
-                    <option>30 minutes</option>
-                    <option>45 minutes</option>
-                    <option>60 minutes</option>
-                  </select>
-                </div>
-                <div>
-                  <label for="decisionMaker">Are you a decision-maker?</label>
-                  <select id="decisionMaker" name="decisionMaker" required>
-                    <option value="" selected disabled>Select</option>
-                    <option>Yes</option>
-                    <option>No</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label for="trackRecord">What proof currently exists?</label>
-                <textarea id="trackRecord" name="trackRecord" placeholder="Revenue, outcomes, projects, publications, partnerships, metrics." required></textarea>
-              </div>
-
-              <div class="actions">
-                <button class="btn btn-secondary" type="button" id="back1">Back</button>
-                <button class="btn btn-primary" type="submit">Continue</button>
-              </div>
-            </form>
-          </section>
-
-          <!-- STEP 3 -->
-          <section id="step3" class="hidden">
-            <h2 class="form-title">Final Confirmation</h2>
-            <p class="form-sub">Submit your inquiry. You will receive next steps if approved for review.</p>
-
-            <div class="success" id="reviewBox">
-              <strong style="font-family:var(--system);font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:12px;color:rgba(234,102,223,.85);">
-                Review Summary
-              </strong>
-              <div style="margin-top:10px;display:grid;gap:10px;font-size:14px;color:rgba(234,102,223,.85);">
-                <div><span style="color:rgba(201,164,77,.95);font-family:var(--system);font-weight:700;">Name:</span> <span id="sumName"></span></div>
-                <div><span style="color:rgba(201,164,77,.95);font-family:var(--system);font-weight:700;">Email:</span> <span id="sumEmail"></span></div>
-                <div><span style="color:rgba(201,164,77,.95);font-family:var(--system);font-weight:700;">Role:</span> <span id="sumRole"></span></div>
-                <div><span style="color:rgba(201,164,77,.95);font-family:var(--system);font-weight:700;">Company:</span> <span id="sumCompany"></span></div>
-                <div><span style="color:rgba(201,164,77,.95);font-family:var(--system);font-weight:700;">Region:</span> <span id="sumRegion"></span></div>
-                <div><span style="color:rgba(201,164,77,.95);font-family:var(--system);font-weight:700;">Capacity:</span> <span id="sumCapacity"></span></div>
-                <div><span style="color:rgba(201,164,77,.95);font-family:var(--system);font-weight:700;">Decision-maker:</span> <span id="sumDM"></span></div>
-              </div>
-            </div>
-
-            <form id="form3" style="margin-top:14px" novalidate>
-              <div class="actions">
-                <button class="btn btn-secondary" type="button" id="back2">Back</button>
-                <button class="btn btn-primary" type="submit">Submit Inquiry</button>
-              </div>
-
-              <div class="fineprint">
-                Submission routes to manual review. Do not submit if you cannot complete 45 days.
-              </div>
-            </form>
-
-            <!-- Replace this with your real backend response state -->
-            <div id="done" class="hidden" style="margin-top:14px">
-              <div class="success">
-                <strong style="font-family:var(--headline);font-weight:500;font-size:18px;">Inquiry received.</strong>
-                <div style="margin-top:6px;color:rgba(234,102,223,.82);font-size:14px;">
-                  If approved for review, you will receive next steps by email.
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <footer>
-            <div>The Collective</div>
-            <div>© 2026. All Rights Reserved.</div>
-          </footer>
-
-        </div>
-      </aside>
-
+  <!-- Hero / Headline Section -->
+  <section class="hero" id="top">
+    <div class="section-inner">
+      <h1 class="headline reveal">Building the infrastructure of trust, one story at a time.</h1>
+      <p class="subheadline reveal" style="font-size: 1.8rem; max-width: 800px; margin: 0 auto 40px; text-align: center;">
+        An exclusive 45-day sprint to align your professional footprint with the weight of your economic mission.
+      </p>
     </div>
-  </div>
+  </section>
 
+  <!-- Why the Paving Period / Benefits -->
+  <section class="benefits" id="benefits">
+    <div class="section-inner">
+      <p class="section-label reveal">Why the Paving Period is the Standard for Catalysts</p>
+      <div class="copy reveal">
+        <p>Excellence is often built in silence, but it is scaled through trust. For many Catalysts, there is a persistent friction: your operational depth is significant, but your professional footprint doesn't yet reflect the true weight of your mission. You have the stones to build a better economy, but the road leading to your vision remains unpaved.</p>
+        <p>The 45-Day Paving Period is a disciplined transition designed to close this gap. While the rest of the market is focused on chasing views, the Paving Period focuses on Infrastructure. We are looking for Business Leaders—those who value systems, standards, and depth. Over the next 45 days, you will secure:</p>
+        
+        <ul style="margin: 40px 0; font-size: 1.2rem; line-height: 1.6;">
+          <li><strong>The Disciplined Narrative:</strong> A 45-day structured execution plan (The Protocol) designed to extract your deep expertise and turn it into a grounded public presence.</li>
+          <li><strong>The Collective Perspective:</strong> Every leader who maintains the protocol is featured on The Collective Podcast. This is your documented "Archive of Thought"—a high-value asset that serves as a landmark for your leadership and a resource for the community.</li>
+          <li><strong>Strategic Partnership:</strong> Access to a curated circle of mission-driven leaders. We facilitate collaborations that are engineered for international progress, ensuring your efforts contribute to a larger economic landscape.</li>
+          <li><strong>The Exclusive Awards:</strong> Finishers who demonstrate high alignment with the mission of the Collective may be recognized through our core distinctions:
+            <ul style="margin: 16px 0 0 40px; list-style: disc;">
+              <li><strong>The Posterity Award:</strong> Honoring those whose work is built for the benefit of future generations.</li>
+              <li><strong>The Legacy Award:</strong> For those whose stories are documented through significant media, publications, or global platforms.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq" id="faq">
+    <div class="section-inner">
+      <p class="section-label reveal">Grounded Answers for Catalysts</p>
+      <div class="faq-list reveal">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            <h4>How much time does this require daily?</h4>
+            <div class="faq-toggle">+</div>
+          </div>
+          <div class="faq-answer">
+            <p>The Paving Period is designed for active Business Leaders. The daily protocol requires roughly 30-60 minutes of intentional execution. It is not an "extra" job; it is the systematic refinement of the work you are already doing.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            <h4>Is this just about posting on social media?</h4>
+            <div class="faq-toggle">+</div>
+          </div>
+          <div class="faq-answer">
+            <p>No. Content is simply the "story" we use to pave the road. The real work is the internalization of your mission and the building of a visible track record that high-level partners and the community can trust.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            <h4>Who is this for?</h4>
+            <div class="faq-toggle">+</div>
+          </div>
+          <div class="faq-answer">
+            <p>Specifically for growth-minded catalysts, decision-makers, business owners, and high performers who have a heart for advancing economies. If you are looking for "fame" or "viral hacks," this is not the right environment for you.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            <h4>What happens after the 45 days?</h4>
+            <div class="faq-toggle">+</div>
+          </div>
+          <div class="faq-answer">
+            <p>Everyone who joins begins as an Aspirant and enters the 45-day Paving Period. During this time, payment does not guarantee permanence — completion does. If you fail to complete the 45 days, you will be removed from the ecosystem. Those who successfully finish graduate as a Catalyst, becoming official members of The Collective, fully integrated into the ecosystem, receiving a featured podcast asset, becoming eligible for the Exclusive Awards, and earning recognition for their commitment to posterity and legacy.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            <h4>Is there a fee?</h4>
+            <div class="faq-toggle">+</div>
+          </div>
+          <div class="faq-answer">
+            <p>The initial waitlist inquiry is a screening process. While there is a commitment required, we prioritize Culture Alignment and Operational Standards over volume.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Waitlist / Form -->
+  <section class="waitlist" id="waitlist">
+    <div class="section-inner">
+      <p class="section-label reveal" style="justify-content:center;">Pave Your Mission</p>
+      <h2 class="headline reveal">
+        Ready to<br/>
+        <span class="editorial">Pave Your Mission?</span>
+      </h2>
+      <p class="reveal">This is a screening process. We review every application manually. Standards over volume. Culture over scale.</p>
+      <div class="form-wrap reveal">
+        <div id="form-container">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="fname" placeholder="Your full name" />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="your@business.com" />
+          </div>
+          <button class="btn-submit" onclick="handleSubmit()">
+            Pave Your Mission &nbsp;→
+          </button>
+          <p class="form-disclaimer">
+            By submitting, you acknowledge that acceptance is not guaranteed.<br/>
+            <span>Culture alignment is evaluated throughout the entire 45 days.</span>
+          </p>
+        </div>
+        <div class="success-msg" id="success-msg" style="display:none;">
+          <h3>Application Received.</h3>
+          <p>You will be contacted within 3–5 business days if your profile aligns with The Collective's standards. In the meantime — keep building.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div>
+          <div class="footer-brand-name">The Collective</div>
+          <div class="footer-tagline">Shaping Leaders. Advancing Economies.</div>
+        </div>
+        <p class="footer-mission">
+          Building the infrastructure of trust for international progress. The Collective is not a program — it is a standard.
+        </p>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">The Collective © 2026. All Rights Reserved.</p>
+        <div class="footer-links">
+          <a href="#">Terms & Conditions</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#top">Back to Top</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts (unchanged from original) -->
   <script>
-    // Simple 3-step funnel logic (client-side only).
-    // Replace final submit with your backend endpoint (fetch POST) when ready.
-
-    const step1 = document.getElementById("step1");
-    const step2 = document.getElementById("step2");
-    const step3 = document.getElementById("step3");
-    const done  = document.getElementById("done");
-
-    const s1 = document.getElementById("s1");
-    const s2 = document.getElementById("s2");
-    const s3 = document.getElementById("s3");
-    const stepLabel = document.getElementById("stepLabel");
-
-    const state = {};
-
-    function setStep(n){
-      step1.classList.toggle("hidden", n !== 1);
-      step2.classList.toggle("hidden", n !== 2);
-      step3.classList.toggle("hidden", n !== 3);
-
-      s1.classList.toggle("active", n === 1);
-      s2.classList.toggle("active", n === 2);
-      s3.classList.toggle("active", n === 3);
-
-      stepLabel.textContent = `Step ${n} of 3`;
-      done.classList.add("hidden");
-      window.scrollTo({top: 0, behavior: "smooth"});
-    }
-
-    function requiredOk(form){
-      // Minimal validation. Enforces specificity by not allowing empty required fields.
-      const required = form.querySelectorAll("[required]");
-      for (const el of required){
-        const v = (el.value || "").trim();
-        if (!v){
-          el.focus();
-          el.style.borderColor = "rgba(201,164,77,1)";
-          el.style.boxShadow = "0 0 0 6px rgba(201,164,77,.12)";
-          return false;
+    /* Scroll reveal */
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          observer.unobserve(e.target);
         }
-      }
-      return true;
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => observer.observe(el));
+
+    /* FAQ toggle */
+    function toggleFaq(item) {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
     }
 
-    document.getElementById("form1").addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (!requiredOk(e.target)) return;
+    /* Form submit */
+    function handleSubmit() {
+      const fname = document.getElementById('fname').value.trim();
+      const email = document.getElementById('email').value.trim();
+      if (!fname || !email) {
+        alert('Please enter your full name and email address.');
+        return;
+      }
+      document.getElementById('form-container').style.display = 'none';
+      document.getElementById('success-msg').style.display = 'block';
+    }
 
-      state.firstName = document.getElementById("firstName").value.trim();
-      state.lastName  = document.getElementById("lastName").value.trim();
-      state.email     = document.getElementById("email").value.trim();
-      state.role      = document.getElementById("role").value.trim();
-      state.company   = document.getElementById("company").value.trim();
-      state.region    = document.getElementById("region").value;
-
-      setStep(2);
+    /* Smooth anchor nav */
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+      });
     });
-
-    document.getElementById("form2").addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (!requiredOk(e.target)) return;
-
-      state.mission      = document.getElementById("mission").value.trim();
-      state.capacity     = document.getElementById("capacity").value;
-      state.decisionMaker= document.getElementById("decisionMaker").value;
-      state.trackRecord  = document.getElementById("trackRecord").value.trim();
-
-      // Fill summary
-      document.getElementById("sumName").textContent = `${state.firstName} ${state.lastName}`;
-      document.getElementById("sumEmail").textContent = state.email;
-      document.getElementById("sumRole").textContent = state.role;
-      document.getElementById("sumCompany").textContent = state.company;
-      document.getElementById("sumRegion").textContent = state.region;
-      document.getElementById("sumCapacity").textContent = state.capacity;
-      document.getElementById("sumDM").textContent = state.decisionMaker;
-
-      setStep(3);
-    });
-
-    document.getElementById("form3").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      // Replace with your real endpoint:
-      // await fetch("/api/waitlist", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(state) });
-
-      // Simulated completion state:
-      done.classList.remove("hidden");
-      step1.classList.add("hidden");
-      step2.classList.add("hidden");
-
-      // Lock stepper in final state:
-      s1.classList.remove("active");
-      s2.classList.remove("active");
-      s3.classList.add("active");
-      stepLabel.textContent = "Submitted";
-    });
-
-    document.getElementById("back1").addEventListener("click", () => setStep(1));
-    document.getElementById("back2").addEventListener("click", () => setStep(2));
-
-    setStep(1);
   </script>
 </body>
 </html>
-
